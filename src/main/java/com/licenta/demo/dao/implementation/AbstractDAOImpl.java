@@ -49,7 +49,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
         return elements;
     }
 
-    public T add(T t) throws Exception {
+    public T add(T t) {
         Transaction transaction = null;
         try (Session session = getSession()) {
             transaction = session.beginTransaction();
@@ -58,7 +58,6 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
         } catch (Exception e) {
 //            log.error("Cannot add " + getEntityClass().getSimpleName(), e);
             System.out.println(e.getMessage());
-            throw new Exception(e);
         }
         return t;
     }

@@ -30,6 +30,27 @@ public class User {
     @JoinTable(name="UserPosts", joinColumns = {@JoinColumn(name="UserId")}, inverseJoinColumns={@JoinColumn(name = "PostId")})
     private List<Post> posts;
 
+    @ManyToOne
+    @JoinColumn(name="RoleId")
+    private Role role;
+
+    public User(String firstName, String lastName, String userName, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+        this.password = password;
+    }
+
+    public User() {}
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public Long getId() {
         return id;
     }
