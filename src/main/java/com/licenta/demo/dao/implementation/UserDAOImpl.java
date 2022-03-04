@@ -24,9 +24,10 @@ public class UserDAOImpl extends AbstractDAOImpl<User> implements UserDAO {
             CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(getEntityClass());
             Root<User> root = criteriaQuery.from(getEntityClass());
             criteriaQuery.select(root);
-            criteriaQuery.where(criteriaBuilder.equal(root.get("UserName"), username));
+            criteriaQuery.where(criteriaBuilder.equal(root.get("userName"), username));
             user = session.createQuery(criteriaQuery).uniqueResult();
         } catch (Exception e) {
+            e.printStackTrace();
 //            log.error(e);
         }
         return user;
