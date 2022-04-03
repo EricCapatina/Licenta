@@ -1,10 +1,16 @@
 package com.licenta.demo.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.springframework.lang.NonNull;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="posts")
@@ -14,6 +20,9 @@ public class Post {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="PostId")
     private Long id;
+
+    @Column(name="Title", length = 32)
+    private String title;
 
     @Column(name="TextData", length = 512)
     private String textData;
@@ -27,7 +36,11 @@ public class Post {
     @Column(name="PostDisLikes")
     private Long disLikes;
 
+    @Column(name="Author")
+    private String author;
+
     @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name="UserId", nullable=false)
     private User user;
 
@@ -104,6 +117,29 @@ public class Post {
         this.comments = comments;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthorUserName() {
+        if (Objects.nonNull(user)) {
+            return user.getUserName();
+        }
+        throw new NullPointerException("No user found");
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     @Override
     public String toString() {
         return "Post{" +
@@ -111,6 +147,7 @@ public class Post {
                 ", textData='" + textData + '\'' +
                 ", timePlaced=" + timePlaced +
                 ", likes=" + likes +
+                ", author=" + author +
                 ", disLikes=" + disLikes +
                 ", user=" + user +
                 ", comments=" + comments +

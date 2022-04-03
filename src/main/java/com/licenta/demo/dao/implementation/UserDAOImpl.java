@@ -14,6 +14,7 @@ import javax.persistence.criteria.Root;
 public class UserDAOImpl extends AbstractDAOImpl<User> implements UserDAO {
 
 //    final static Logger log = Logger.getLogger(AbstractDAOImpl.class.getName());
+    private static final String USERNAME = "userName";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -24,7 +25,7 @@ public class UserDAOImpl extends AbstractDAOImpl<User> implements UserDAO {
             CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(getEntityClass());
             Root<User> root = criteriaQuery.from(getEntityClass());
             criteriaQuery.select(root);
-            criteriaQuery.where(criteriaBuilder.equal(root.get("userName"), username));
+            criteriaQuery.where(criteriaBuilder.equal(root.get(USERNAME), username));
             user = session.createQuery(criteriaQuery).uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();

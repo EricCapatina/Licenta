@@ -1,29 +1,31 @@
 package com.licenta.demo.controller;
 
+import com.licenta.demo.database.entity.Post;
+import com.licenta.demo.database.entity.Role;
 import com.licenta.demo.database.entity.User;
+import com.licenta.demo.database.entity.dto.UserDTO;
+import com.licenta.demo.service.implementation.PostServiceImpl;
 import com.licenta.demo.service.implementation.UserServiceImpl;
 import org.hibernate.HibernateException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
 
     private final UserServiceImpl userService;
+    private final PostServiceImpl postService;
 
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserServiceImpl userService, PostServiceImpl postService) {
         this.userService = userService;
+        this.postService = postService;
     }
 
     @GetMapping("/users")
@@ -70,10 +72,11 @@ public class UserController {
         try {
             User userInDatabase = userService.getUserByUsername(user.getUserName());
 
-            if (userInDatabase != null) {
+            if (Objects.nonNull(userInDatabase)) {
                 return new ResponseEntity<String>("User by username " + user.getUserName() + " already exists in database",
                         HttpStatus.BAD_REQUEST);
             }
+            user.setRole(new Role(1L));
             userService.saveUser(user);
             return new ResponseEntity<User>(HttpStatus.OK);
         } catch (Exception e) {
@@ -90,6 +93,25 @@ public class UserController {
             return new ResponseEntity<String>("User by id " + id + "  not found", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (HibernateException e) {
             return new ResponseEntity<String>("User can't be deleted", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/users/addPost/{userName}")
+    public ResponseEntity<?> addPostToUser(@PathVariable("userName") String userName, @RequestBody Post post) {
+        try {
+            Post markedPost = postService.getPostById(post.getId());
+            if(Objects.isNull(markedPost)) System.out.println("Post doesn't exists, creating a new one...");
+            User user = userService.getUserByUsername(userName);
+            post.setUser(user);
+            if(!post.getAuthorUserName().equalsIgnoreCase(post.getAuthor()))
+                throw new IllegalArgumentException("No user exists in database with such Author Name");
+            postService.createPost(post);
+            Long id = user.getId();
+            userService.addPostToUser(post, id);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Cannot mark post for user", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

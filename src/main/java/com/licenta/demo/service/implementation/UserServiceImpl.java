@@ -2,6 +2,7 @@ package com.licenta.demo.service.implementation;
 
 import com.licenta.demo.converter.UserEntityToUserDTO;
 import com.licenta.demo.dao.implementation.UserDAOImpl;
+import com.licenta.demo.database.entity.Post;
 import com.licenta.demo.database.entity.SecurityUser;
 import com.licenta.demo.database.entity.User;
 import com.licenta.demo.database.entity.dto.UserDTO;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -41,7 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> getAllUsers() throws HibernateException {
         List<UserDTO> users = converter.userModelToUserDto(userDAO.getAll());
-        if (users == null) throw new HibernateException("Users == null");
+        if (Objects.isNull(users)) throw new NullPointerException("Cannot find any users.");
         return users;
     }
 
@@ -55,14 +57,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = getUserByUsername(username);
-        if (user == null) throw new UsernameNotFoundException("User by username " + username + " not found");
+        if (Objects.isNull(user)) throw new NullPointerException("User by username " + username + " not found");
         return SecurityUser.fromUser(user);
     }
 
     @Override
     public User updateUserById(User userInfo) {
         User user = userDAO.getById(userInfo.getId());
-        if (user == null) throw new UsernameNotFoundException("User not found");
+        if (Objects.isNull(user)) throw new NullPointerException("User not found");
         if (!userInfo.getUserName().isEmpty())
             user.setUserName(userInfo.getUserName());
         if (!userInfo.getFirstName().isEmpty())
@@ -75,12 +77,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserByUsername(String username) throws UsernameNotFoundException {
         User user = getUserByUsername(username);
-        if (user == null) throw new UsernameNotFoundException("User not found");
+        if (Objects.isNull(user)) throw new NullPointerException("User not found");
         userDAO.remove(user);
     }
 
     @Override
     public void deleteUserByID(Long id) {
         userDAO.removeById(id);
+    }
+
+    @Override
+    public User addPostToUser(Post post, long id) {
+        User user = userDAO.getById(id);
+        Post markedPost = user.getPosts()
+                .stream()
+                .filter(markedPosts -> markedPosts.getId().equals(post.getId()))
+                .findAny().orElse(null);
+
+        if (Objects.isNull(markedPost)) {
+            user.addPost(post);
+        }
+
+        return userDAO.update(user);
     }
 }

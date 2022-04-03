@@ -2,6 +2,7 @@ package com.licenta.demo.database.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,7 +40,12 @@ public class Role {
         this.name = name;
     }
 
-    public Role() {}
+    public Role() {
+
+    }
+    public Role(Long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;
@@ -54,10 +60,10 @@ public class Role {
     }
 
     public void setUser(User user) {
-        if (users != null) {
+        if (Objects.nonNull(users)) {
             users = new ArrayList<User>();
         }
-        if (user != null)
+        if (Objects.nonNull(user))
             users.add(user);
     }
 
@@ -70,7 +76,7 @@ public class Role {
     }
 
     public Permission addPermission(Permission permission) {
-        if (this.permissions == null) {
+        if (Objects.isNull(this.permissions)) {
             this.permissions = new ArrayList<Permission>();
         }
         this.permissions.add(permission);
@@ -91,7 +97,7 @@ public class Role {
     }
 
     public void setId(Long roleId) {
-        if(roleId != null) {
+        if(Objects.nonNull(roleId)) {
             this.id = roleId;
         }
     }

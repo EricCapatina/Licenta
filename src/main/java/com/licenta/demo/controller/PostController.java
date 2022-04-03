@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import com.licenta.demo.database.entity.Post;
 import com.licenta.demo.service.implementation.PostServiceImpl;
@@ -11,14 +12,9 @@ import org.hibernate.HibernateException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
 public class PostController {
@@ -34,6 +30,7 @@ public class PostController {
         try {
             return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
         } catch (HibernateException e) {
+            e.printStackTrace();
             return new ResponseEntity<>("Cannot receive list of posts from server", HttpStatus.OK);
         }
     }
@@ -55,19 +52,23 @@ public class PostController {
     public ResponseEntity<String> deletePostkById(@PathVariable("id") Long id) {
         try {
             postService.deletePostByID(id);
-            return new ResponseEntity<>("post was deleted successfully", HttpStatus.OK);
+            return new ResponseEntity<>("Post was deleted successfully", HttpStatus.OK);
         } catch (HibernateException e) {
-            return new ResponseEntity<>("post can't be deleted", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Post can't be deleted", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(value = "/posts/id/{id}")
-    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<?> getPostById(@PathVariable("id") Long id) {
         try {
+            System.out.println(postService.getPostById(id).toString());
             return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
         } catch (HibernateException e) {
-            return new ResponseEntity<>("Cannot create new post in database", HttpStatus.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+            return new ResponseEntity<>("Cannot find post in database", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -75,7 +76,7 @@ public class PostController {
     public ResponseEntity<?> getUserPosts(String userName) {
         try {
             List<Post> userposts = postService.getUserPosts(userName);
-            if (userposts == null) {
+            if (Objects.isNull(userposts)) {
                 return new ResponseEntity<>("User don't have any posts to work on", HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(userposts, HttpStatus.OK);

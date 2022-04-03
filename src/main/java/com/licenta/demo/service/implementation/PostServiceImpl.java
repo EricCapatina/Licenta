@@ -1,8 +1,9 @@
 package com.licenta.demo.service.implementation;
 
-import com.licenta.demo.dao.PostDAO;
+import com.licenta.demo.converter.PostEntityToPostDTO;
 import com.licenta.demo.dao.implementation.PostDAOImpl;
 import com.licenta.demo.database.entity.Post;
+import com.licenta.demo.database.entity.dto.PostDTO;
 import com.licenta.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,12 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostDAOImpl postDAO;
+    private final PostEntityToPostDTO converter;
 
     @Autowired
-    public PostServiceImpl(PostDAOImpl postDAO) {
+    public PostServiceImpl(PostDAOImpl postDAO, PostEntityToPostDTO converter) {
         this.postDAO = postDAO;
+        this.converter = converter;
     }
 
     @Override
@@ -26,13 +29,13 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public List<Post> getAllPosts() {
-        return postDAO.getAll();
+    public List<PostDTO> getAllPosts() {
+        return converter.postModelToPostDto(postDAO.getAll());
     }
 
     @Override
-    public Post getPostById(long id) {
-        return postDAO.getById(id);
+    public Post getPostById(Long id) {
+        return postDAO.getPostById(id);
     }
 
     @Override

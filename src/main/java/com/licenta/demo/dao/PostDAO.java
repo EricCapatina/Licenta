@@ -8,4 +8,6 @@ public interface PostDAO {
 
     List<Post> getUserPosts(String userName);
 
+    Post getPostById(Long id);
+
 }
