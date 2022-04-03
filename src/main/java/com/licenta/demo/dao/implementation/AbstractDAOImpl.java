@@ -27,6 +27,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
         try {
             return this.sessionFactory.openSession();
         } catch (HibernateException e) {
+            e.printStackTrace();
 //            log.error("Error in getSession method", e);
         }
         return null;
@@ -45,6 +46,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
             session.close();
         } catch (Exception e) {
 //            log.error("Cannot get information about" + getEntityClass().getSimpleName() + " entities from database", e);
+            e.printStackTrace();
         }
         return elements;
     }
@@ -69,6 +71,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
             session.merge(t);
             transaction.commit();
         } catch (Exception e) {
+            e.printStackTrace();
 //            log.error("Cannot update " + getEntityClass().getSimpleName() + " information", e);
         }
         return t;
@@ -81,6 +84,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
             session.delete(t);
             transaction.commit();
         } catch (HibernateException e) {
+            e.printStackTrace();
 //            log.error("Cannot remove " + getEntityClass().getSimpleName() + " information", e);
         }
     }
@@ -93,6 +97,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
             session.delete(session.find(getEntityClass(), id));
             transaction.commit();
         } catch (HibernateException e) {
+            e.printStackTrace();
 //            log.error("Cannot remove " + getEntityClass().getSimpleName() + " information", e);
         }
     }
@@ -101,7 +106,7 @@ public abstract class AbstractDAOImpl<T> implements AbstractDAO<T> {
         try (Session session = getSession()) {
             return session.find(getEntityClass(), id);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }

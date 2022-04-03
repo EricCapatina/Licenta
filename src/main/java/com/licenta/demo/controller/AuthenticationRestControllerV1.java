@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,6 +31,11 @@ public class AuthenticationRestControllerV1 {
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private static final String USERNAME = "username";
+    private static final String JWTTOKEN = "token";
+    private static final String EXPIRATIONTIME = "expirationToken";
+    private static final String ROLE = "role";
+    private static final String PERMISSIONS = "permissions";
 
     public AuthenticationRestControllerV1(AuthenticationManager authenticationManager, UserServiceImpl userService, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
@@ -42,7 +48,7 @@ public class AuthenticationRestControllerV1 {
         try {
             User user = userService.getUserByUsername(request.getUsername());
 
-            if (user == null) {
+            if (Objects.isNull(user)) {
                 throw new BadCredentialsException("Invalid email/password combination");
             }
 
@@ -50,15 +56,17 @@ public class AuthenticationRestControllerV1 {
 
             String token = jwtTokenProvider.createToken(request.getUsername(), user.getRole().getName());
             Map<Object, Object> response = new HashMap<>();
-            response.put("username", request.getUsername());
-            response.put("token", token);
-            response.put("expirationToken", jwtExpiration);
-            response.put("role", user.getRole().getName());
-            response.put("permissions", user.getRole().getAuthorities().toString());
+            response.put(USERNAME, request.getUsername());
+            response.put(JWTTOKEN, token);
+            response.put(EXPIRATIONTIME, jwtExpiration);
+            response.put(ROLE, user.getRole().getName());
+            response.put(PERMISSIONS, user.getRole().getAuthorities().toString());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (BadCredentialsException e) {
+            e.printStackTrace();
             return new ResponseEntity<>(e, HttpStatus.FORBIDDEN);
         } catch (Exception ex) {
+            ex.printStackTrace();
             return new ResponseEntity<>(ex, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -69,10 +77,10 @@ public class AuthenticationRestControllerV1 {
             User createUser = userService.saveUser(user);
             String token = jwtTokenProvider.createToken(createUser.getUserName(), createUser.getRole().getName());
             Map<Object, Object> response = new HashMap<>();
-            response.put("username", createUser.getUserName());
-            response.put("token", token);
-            response.put("expirationToken", jwtExpiration);
-            response.put("role", createUser.getRole().getName());
+            response.put(USERNAME, createUser.getUserName());
+            response.put(JWTTOKEN, token);
+            response.put(EXPIRATIONTIME, jwtExpiration);
+            response.put(ROLE, createUser.getRole().getName());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>("Invalid email/password combination", HttpStatus.FORBIDDEN);
