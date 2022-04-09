@@ -1,16 +1,31 @@
 package com.licenta.demo.database.entity.dto;
 
+import com.licenta.demo.database.entity.Comment;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class PostDTO {
 
     private Long id;
     private String title;
     private LocalDateTime timePlaced;
+    private LocalDateTime formattimePlaced;
     private Long likes;
     private Long disLikes;
+    private String author;
+    private String textData;
+    private List<Comment> comments;
     private final static String DATEPATTERN = "yyyy-MM-dd";
+
+    public LocalDateTime getFormattimePlaced() {
+        return formattimePlaced;
+    }
+
+    public void setFormattimePlaced(LocalDateTime formattimePlaced) {
+        this.formattimePlaced = formattimePlaced;
+    }
 
     public Long getId() {
         return id;
@@ -18,6 +33,30 @@ public class PostDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTextData() {
+        return textData;
+    }
+
+    public void setTextData(String textData) {
+        this.textData = textData;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getTitle() {

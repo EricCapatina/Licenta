@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("/api/v1")
 public class PostController {
@@ -28,7 +28,7 @@ public class PostController {
     @GetMapping("/posts")
     public ResponseEntity<?> getAllPosts() {
         try {
-            return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
+            return new ResponseEntity<>(postService.getAllDetailedPosts(), HttpStatus.OK);
         } catch (HibernateException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Cannot receive list of posts from server", HttpStatus.OK);
@@ -61,12 +61,11 @@ public class PostController {
     @GetMapping(value = "/posts/id/{id}")
     public ResponseEntity<?> getPostById(@PathVariable("id") Long id) {
         try {
-            System.out.println(postService.getPostById(id).toString());
-            return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
+            return new ResponseEntity<>(postService.getPostDetailById(id), HttpStatus.OK);
         } catch (HibernateException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Cannot find post in database", HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
