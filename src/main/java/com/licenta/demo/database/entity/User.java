@@ -1,5 +1,6 @@
 package com.licenta.demo.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NotFound;
@@ -35,6 +36,12 @@ public class User {
     @JoinTable(name="UserPosts", joinColumns = {@JoinColumn(name="UserId")}, inverseJoinColumns={@JoinColumn(name = "PostId")})
     private List<Post> posts;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade={CascadeType.ALL})
+    @JoinTable(name="UserComments", joinColumns = {@JoinColumn(name="UserId")}, inverseJoinColumns={@JoinColumn(name = "CommentId")})
+    private List<Comment> comments;
+
+    @JsonIgnore
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name="RoleId")

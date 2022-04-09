@@ -1,11 +1,13 @@
 package com.licenta.demo.service.implementation;
 
+import com.licenta.demo.converter.PostEntityToPostDTO;
 import com.licenta.demo.converter.UserEntityToUserDTO;
 import com.licenta.demo.dao.implementation.UserDAOImpl;
 import com.licenta.demo.database.entity.Post;
 import com.licenta.demo.database.entity.SecurityUser;
 import com.licenta.demo.database.entity.User;
 import com.licenta.demo.database.entity.dto.UserDTO;
+import com.licenta.demo.database.entity.dto.UserDetailsDTO;
 import com.licenta.demo.service.UserService;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDetailsDTO getUserDetailsById(Long id) throws Exception {
+        try {
+            User user = userDAO.getById(id);
+            return converter.userModelToUserDetailsDto(user);
+        } catch (Exception e) {
+            throw new Exception("Error in getUserDetailsById");
+        }
+    }
+
+    @Override
     public User getUserByUsername(String username) {
         return userDAO.getUserByUsername(username);
+    }
+
+    @Override
+    public UserDetailsDTO getUserDetailsByUsername(String username) {
+        User user = userDAO.getUserByUsername(username);
+        return converter.userModelToUserDetailsDto(user);
+    }
+
+    @Override
+    public UserDetailsDTO getUserMarkedPostsById(Long id) {
+        User user = userDAO.getById(id);
+        return converter.getUserMarkedPostsDTO(user);
     }
 
     @Override
