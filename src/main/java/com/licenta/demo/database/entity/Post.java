@@ -1,14 +1,15 @@
 package com.licenta.demo.database.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.springframework.lang.NonNull;
-
+import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,8 @@ public class Post {
     @Column(name="TextData", length = 512)
     private String textData;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "YYYY-MM-dd")
     @Column(name="TimePlaced")
     private LocalDateTime timePlaced;
 
@@ -39,6 +42,7 @@ public class Post {
     @Column(name="Author")
     private String author;
 
+    @JsonIgnore
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name="UserId", nullable=false)
@@ -49,9 +53,18 @@ public class Post {
     @JoinTable(name="PostComments", joinColumns = {@JoinColumn(name="PostId")}, inverseJoinColumns={@JoinColumn(name = "CommentId")})
     private List<Comment> comments;
 
+    @JsonIgnore
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToMany(mappedBy = "posts")
     private List<Reaction> reactions;
+
+    public Post() {}
+
+    public Post(Long id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+    }
 
     public List<Reaction> getReactions() {
         return reactions;
@@ -125,12 +138,12 @@ public class Post {
         this.title = title;
     }
 
-    public String getAuthorUserName() {
-        if (Objects.nonNull(user)) {
-            return user.getUserName();
-        }
-        throw new NullPointerException("No user found");
-    }
+//    public String getAuthorUserName() {
+//        if (Objects.nonNull(user)) {
+//            return user.getUserName();
+//        }
+//        throw new NullPointerException("No user found");
+//    }
 
     public String getAuthor() {
         return author;
@@ -144,13 +157,9 @@ public class Post {
     public String toString() {
         return "Post{" +
                 "id=" + id +
-                ", textData='" + textData + '\'' +
-                ", timePlaced=" + timePlaced +
-                ", likes=" + likes +
+                ", title=" + title +
                 ", author=" + author +
-                ", disLikes=" + disLikes +
-                ", user=" + user +
-                ", comments=" + comments +
+
                 '}';
     }
 }

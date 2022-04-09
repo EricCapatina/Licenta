@@ -1,9 +1,14 @@
 package com.licenta.demo.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name="comments")
@@ -26,6 +31,16 @@ public class Comment {
     @Column(name="CommentDisLikes")
     private Long disLikes;
 
+    @Column(name="CommentAuthor")
+    private String authorName;
+
+    @JsonIgnore
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name="UserId", nullable=false)
+    private User user;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="PostId", nullable=false)
     private Post post;
@@ -78,6 +93,25 @@ public class Comment {
         this.post = post;
     }
 
+    public String getAuthorName() {
+        if(Objects.nonNull(user)) {
+            return user.getUserName();
+        }
+        throw new NullPointerException("User not found");
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
@@ -86,7 +120,6 @@ public class Comment {
                 ", timePlaced=" + timePlaced +
                 ", likes=" + likes +
                 ", disLikes=" + disLikes +
-                ", post=" + post +
                 '}';
     }
 }
